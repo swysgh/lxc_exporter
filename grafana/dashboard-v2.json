@@ -1,0 +1,1660 @@
+{
+ "kind": "Dashboard",
+ "apiVersion": "dashboard.grafana.app/v2",
+ "metadata": {},
+ "spec": {
+  "annotations": [
+   {
+    "kind": "AnnotationQuery",
+    "spec": {
+     "query": {
+      "kind": "DataQuery",
+      "group": "grafana",
+      "version": "v0",
+      "datasource": {
+       "name": "-- Grafana --"
+      },
+      "spec": {}
+     },
+     "enable": true,
+     "hide": true,
+     "iconColor": "rgba(0, 211, 255, 1)",
+     "name": "Annotations & Alerts",
+     "builtIn": true
+    }
+   }
+  ],
+  "cursorSync": "Crosshair",
+  "editable": true,
+  "elements": {
+   "panel-1": {
+    "kind": "Panel",
+    "spec": {
+     "id": 1,
+     "title": "运行中的容器",
+     "description": "",
+     "links": [],
+     "data": {
+      "kind": "QueryGroup",
+      "spec": {
+       "queries": [
+        {
+         "kind": "PanelQuery",
+         "spec": {
+          "query": {
+           "kind": "DataQuery",
+           "group": "prometheus",
+           "version": "v0",
+           "datasource": {
+            "name": "${DS_PROMETHEUS}"
+           },
+           "spec": {
+            "editorMode": "code",
+            "expr": "count(lxc_container_up)",
+            "legendFormat": "容器数",
+            "range": true
+           }
+          },
+          "refId": "A",
+          "hidden": false
+         }
+        }
+       ],
+       "transformations": [],
+       "queryOptions": {}
+      }
+     },
+     "vizConfig": {
+      "kind": "VizConfig",
+      "group": "stat",
+      "version": "13.2.2",
+      "spec": {
+       "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+         "calcs": [
+          "lastNotNull"
+         ],
+         "fields": "",
+         "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+       },
+       "fieldConfig": {
+        "defaults": {
+         "mappings": [],
+         "thresholds": {
+          "mode": "absolute",
+          "steps": [
+           {
+            "value": 0,
+            "color": "red"
+           },
+           {
+            "value": 1,
+            "color": "green"
+           }
+          ]
+         },
+         "color": {
+          "mode": "thresholds"
+         },
+         "unit": "short"
+        },
+        "overrides": []
+       }
+      }
+     }
+    }
+   },
+   "panel-2": {
+    "kind": "Panel",
+    "spec": {
+     "id": 2,
+     "title": "容器内存合计",
+     "description": "",
+     "links": [],
+     "data": {
+      "kind": "QueryGroup",
+      "spec": {
+       "queries": [
+        {
+         "kind": "PanelQuery",
+         "spec": {
+          "query": {
+           "kind": "DataQuery",
+           "group": "prometheus",
+           "version": "v0",
+           "datasource": {
+            "name": "${DS_PROMETHEUS}"
+           },
+           "spec": {
+            "editorMode": "code",
+            "expr": "sum(lxc_container_memory_bytes)",
+            "legendFormat": "合计",
+            "range": true
+           }
+          },
+          "refId": "A",
+          "hidden": false
+         }
+        }
+       ],
+       "transformations": [],
+       "queryOptions": {}
+      }
+     },
+     "vizConfig": {
+      "kind": "VizConfig",
+      "group": "stat",
+      "version": "13.2.2",
+      "spec": {
+       "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+         "calcs": [
+          "lastNotNull"
+         ],
+         "fields": "",
+         "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+       },
+       "fieldConfig": {
+        "defaults": {
+         "mappings": [],
+         "thresholds": {
+          "mode": "absolute",
+          "steps": [
+           {
+            "value": 0,
+            "color": "red"
+           },
+           {
+            "value": 1,
+            "color": "green"
+           }
+          ]
+         },
+         "color": {
+          "mode": "thresholds"
+         },
+         "unit": "bytes"
+        },
+        "overrides": []
+       }
+      }
+     }
+    }
+   },
+   "panel-3": {
+    "kind": "Panel",
+    "spec": {
+     "id": 3,
+     "title": "CPU 被限流次数（1h）",
+     "description": "cgroup 把容器 CPU 掐住的次数，一直涨说明该给容器加配额。",
+     "links": [],
+     "data": {
+      "kind": "QueryGroup",
+      "spec": {
+       "queries": [
+        {
+         "kind": "PanelQuery",
+         "spec": {
+          "query": {
+           "kind": "DataQuery",
+           "group": "prometheus",
+           "version": "v0",
+           "datasource": {
+            "name": "${DS_PROMETHEUS}"
+           },
+           "spec": {
+            "editorMode": "code",
+            "expr": "sum(round(increase(lxc_container_cpu_nr_throttled_total[1h])))",
+            "legendFormat": "限流",
+            "range": true
+           }
+          },
+          "refId": "A",
+          "hidden": false
+         }
+        }
+       ],
+       "transformations": [],
+       "queryOptions": {}
+      }
+     },
+     "vizConfig": {
+      "kind": "VizConfig",
+      "group": "stat",
+      "version": "13.2.2",
+      "spec": {
+       "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+         "calcs": [
+          "lastNotNull"
+         ],
+         "fields": "",
+         "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+       },
+       "fieldConfig": {
+        "defaults": {
+         "mappings": [],
+         "thresholds": {
+          "mode": "absolute",
+          "steps": [
+           {
+            "value": 0,
+            "color": "red"
+           },
+           {
+            "value": 1,
+            "color": "green"
+           }
+          ]
+         },
+         "color": {
+          "mode": "thresholds"
+         },
+         "unit": "short"
+        },
+        "overrides": []
+       }
+      }
+     }
+    }
+   },
+   "panel-4": {
+    "kind": "Panel",
+    "spec": {
+     "id": 4,
+     "title": "容器概览",
+     "description": "容器没设 cgroup 上限（memory.max=max），所以没有「上限/使用率」两列 —— 那两个指标只在设了限制时才上报。",
+     "links": [],
+     "data": {
+      "kind": "QueryGroup",
+      "spec": {
+       "queries": [
+        {
+         "kind": "PanelQuery",
+         "spec": {
+          "query": {
+           "kind": "DataQuery",
+           "group": "prometheus",
+           "version": "v0",
+           "datasource": {
+            "name": "${DS_PROMETHEUS}"
+           },
+           "spec": {
+            "editorMode": "code",
+            "expr": "lxc_container_memory_bytes",
+            "legendFormat": "内存",
+            "format": "table",
+            "instant": true,
+            "range": false
+           }
+          },
+          "refId": "A",
+          "hidden": false
+         }
+        },
+        {
+         "kind": "PanelQuery",
+         "spec": {
+          "query": {
+           "kind": "DataQuery",
+           "group": "prometheus",
+           "version": "v0",
+           "datasource": {
+            "name": "${DS_PROMETHEUS}"
+           },
+           "spec": {
+            "editorMode": "code",
+            "expr": "lxc_container_pids",
+            "legendFormat": "进程数",
+            "format": "table",
+            "instant": true,
+            "range": false
+           }
+          },
+          "refId": "B",
+          "hidden": false
+         }
+        },
+        {
+         "kind": "PanelQuery",
+         "spec": {
+          "query": {
+           "kind": "DataQuery",
+           "group": "prometheus",
+           "version": "v0",
+           "datasource": {
+            "name": "${DS_PROMETHEUS}"
+           },
+           "spec": {
+            "editorMode": "code",
+            "expr": "sum by (name) (rate(lxc_container_cpu_seconds_total[5m]))",
+            "legendFormat": "CPU 核数",
+            "format": "table",
+            "instant": true,
+            "range": false
+           }
+          },
+          "refId": "C",
+          "hidden": false
+         }
+        }
+       ],
+       "transformations": [
+        {
+         "kind": "Transformation",
+         "group": "labelsToFields",
+         "spec": {
+          "options": {
+           "mode": "columns"
+          }
+         }
+        },
+        {
+         "kind": "Transformation",
+         "group": "merge",
+         "spec": {
+          "options": {}
+         }
+        },
+        {
+         "kind": "Transformation",
+         "group": "organize",
+         "spec": {
+          "options": {
+           "excludeByName": {
+            "Time": true,
+            "job": true,
+            "instance": true,
+            "exported_instance": true
+           },
+           "renameByName": {
+            "name": "容器",
+            "Value #A": "内存",
+            "Value #B": "进程数",
+            "Value #C": "CPU 核数"
+           }
+          }
+         }
+        }
+       ],
+       "queryOptions": {}
+      }
+     },
+     "vizConfig": {
+      "kind": "VizConfig",
+      "group": "table",
+      "version": "13.2.2",
+      "spec": {
+       "options": {
+        "cellHeight": "sm",
+        "showHeader": true,
+        "sortBy": [
+         {
+          "desc": true,
+          "displayName": "本月入向"
+         }
+        ]
+       },
+       "fieldConfig": {
+        "defaults": {
+         "unit": "short",
+         "thresholds": {
+          "mode": "absolute",
+          "steps": [
+           {
+            "value": 0,
+            "color": "green"
+           }
+          ]
+         },
+         "color": {
+          "mode": "thresholds"
+         },
+         "custom": {
+          "align": "auto",
+          "cellOptions": {
+           "type": "auto"
+          },
+          "footer": {
+           "reducers": [
+            "sum"
+           ]
+          },
+          "inspect": false
+         }
+        },
+        "overrides": [
+         {
+          "matcher": {
+           "id": "byName",
+           "options": "容器"
+          },
+          "properties": [
+           {
+            "id": "unit",
+            "value": "string"
+           }
+          ]
+         },
+         {
+          "matcher": {
+           "id": "byName",
+           "options": "内存"
+          },
+          "properties": [
+           {
+            "id": "unit",
+            "value": "bytes"
+           }
+          ]
+         },
+         {
+          "matcher": {
+           "id": "byName",
+           "options": "进程数"
+          },
+          "properties": [
+           {
+            "id": "unit",
+            "value": "short"
+           }
+          ]
+         },
+         {
+          "matcher": {
+           "id": "byName",
+           "options": "CPU 核数"
+          },
+          "properties": [
+           {
+            "id": "unit",
+            "value": "short"
+           }
+          ]
+         }
+        ]
+       }
+      }
+     }
+    }
+   },
+   "panel-5": {
+    "kind": "Panel",
+    "spec": {
+     "id": 5,
+     "title": "容器 CPU 使用（核数）",
+     "description": "1.0 = 占满一个核。",
+     "links": [],
+     "data": {
+      "kind": "QueryGroup",
+      "spec": {
+       "queries": [
+        {
+         "kind": "PanelQuery",
+         "spec": {
+          "query": {
+           "kind": "DataQuery",
+           "group": "prometheus",
+           "version": "v0",
+           "datasource": {
+            "name": "${DS_PROMETHEUS}"
+           },
+           "spec": {
+            "editorMode": "code",
+            "expr": "sum by (name) (rate(lxc_container_cpu_seconds_total{name=~\"$name\"}[$__rate_interval]))",
+            "legendFormat": "{{name}}",
+            "range": true
+           }
+          },
+          "refId": "A",
+          "hidden": false
+         }
+        }
+       ],
+       "transformations": [],
+       "queryOptions": {}
+      }
+     },
+     "vizConfig": {
+      "kind": "VizConfig",
+      "group": "timeseries",
+      "version": "13.2.2",
+      "spec": {
+       "options": {
+        "legend": {
+         "calcs": [
+          "mean",
+          "max",
+          "lastNotNull"
+         ],
+         "displayMode": "table",
+         "placement": "right",
+         "showLegend": true
+        },
+        "tooltip": {
+         "hideZeros": false,
+         "mode": "multi",
+         "sort": "desc"
+        }
+       },
+       "fieldConfig": {
+        "defaults": {
+         "unit": "short",
+         "thresholds": {
+          "mode": "absolute",
+          "steps": [
+           {
+            "value": 0,
+            "color": "green"
+           }
+          ]
+         },
+         "color": {
+          "mode": "palette-classic"
+         },
+         "custom": {
+          "axisBorderShow": false,
+          "axisCenteredZero": false,
+          "axisColorMode": "text",
+          "axisLabel": "",
+          "axisPlacement": "auto",
+          "barAlignment": 0,
+          "barWidthFactor": 0.6,
+          "drawStyle": "line",
+          "fillOpacity": 10,
+          "gradientMode": "none",
+          "hideFrom": {
+           "legend": false,
+           "tooltip": false,
+           "viz": false
+          },
+          "insertNulls": false,
+          "lineInterpolation": "linear",
+          "lineWidth": 1,
+          "pointSize": 5,
+          "scaleDistribution": {
+           "type": "linear"
+          },
+          "showPoints": "never",
+          "showValues": false,
+          "spanNulls": false,
+          "stacking": {
+           "group": "A",
+           "mode": "none"
+          },
+          "thresholdsStyle": {
+           "mode": "off"
+          }
+         }
+        },
+        "overrides": []
+       }
+      }
+     }
+    }
+   },
+   "panel-6": {
+    "kind": "Panel",
+    "spec": {
+     "id": 6,
+     "title": "容器内存",
+     "description": "",
+     "links": [],
+     "data": {
+      "kind": "QueryGroup",
+      "spec": {
+       "queries": [
+        {
+         "kind": "PanelQuery",
+         "spec": {
+          "query": {
+           "kind": "DataQuery",
+           "group": "prometheus",
+           "version": "v0",
+           "datasource": {
+            "name": "${DS_PROMETHEUS}"
+           },
+           "spec": {
+            "editorMode": "code",
+            "expr": "lxc_container_memory_bytes{name=~\"$name\"}",
+            "legendFormat": "{{name}}",
+            "range": true
+           }
+          },
+          "refId": "A",
+          "hidden": false
+         }
+        }
+       ],
+       "transformations": [],
+       "queryOptions": {}
+      }
+     },
+     "vizConfig": {
+      "kind": "VizConfig",
+      "group": "timeseries",
+      "version": "13.2.2",
+      "spec": {
+       "options": {
+        "legend": {
+         "calcs": [
+          "mean",
+          "max",
+          "lastNotNull"
+         ],
+         "displayMode": "table",
+         "placement": "right",
+         "showLegend": true
+        },
+        "tooltip": {
+         "hideZeros": false,
+         "mode": "multi",
+         "sort": "desc"
+        }
+       },
+       "fieldConfig": {
+        "defaults": {
+         "unit": "bytes",
+         "thresholds": {
+          "mode": "absolute",
+          "steps": [
+           {
+            "value": 0,
+            "color": "green"
+           }
+          ]
+         },
+         "color": {
+          "mode": "palette-classic"
+         },
+         "custom": {
+          "axisBorderShow": false,
+          "axisCenteredZero": false,
+          "axisColorMode": "text",
+          "axisLabel": "",
+          "axisPlacement": "auto",
+          "barAlignment": 0,
+          "barWidthFactor": 0.6,
+          "drawStyle": "line",
+          "fillOpacity": 10,
+          "gradientMode": "none",
+          "hideFrom": {
+           "legend": false,
+           "tooltip": false,
+           "viz": false
+          },
+          "insertNulls": false,
+          "lineInterpolation": "linear",
+          "lineWidth": 1,
+          "pointSize": 5,
+          "scaleDistribution": {
+           "type": "linear"
+          },
+          "showPoints": "never",
+          "showValues": false,
+          "spanNulls": false,
+          "stacking": {
+           "group": "A",
+           "mode": "none"
+          },
+          "thresholdsStyle": {
+           "mode": "off"
+          }
+         }
+        },
+        "overrides": []
+       }
+      }
+     }
+    }
+   },
+   "panel-7": {
+    "kind": "Panel",
+    "spec": {
+     "id": 7,
+     "title": "容器内存构成",
+     "description": "",
+     "links": [],
+     "data": {
+      "kind": "QueryGroup",
+      "spec": {
+       "queries": [
+        {
+         "kind": "PanelQuery",
+         "spec": {
+          "query": {
+           "kind": "DataQuery",
+           "group": "prometheus",
+           "version": "v0",
+           "datasource": {
+            "name": "${DS_PROMETHEUS}"
+           },
+           "spec": {
+            "editorMode": "code",
+            "expr": "sum by (kind) (lxc_container_memory_stat_bytes{name=~\"$name\"})",
+            "legendFormat": "{{kind}}",
+            "range": true
+           }
+          },
+          "refId": "A",
+          "hidden": false
+         }
+        }
+       ],
+       "transformations": [],
+       "queryOptions": {}
+      }
+     },
+     "vizConfig": {
+      "kind": "VizConfig",
+      "group": "timeseries",
+      "version": "13.2.2",
+      "spec": {
+       "options": {
+        "legend": {
+         "calcs": [
+          "mean",
+          "max",
+          "lastNotNull"
+         ],
+         "displayMode": "table",
+         "placement": "right",
+         "showLegend": true
+        },
+        "tooltip": {
+         "hideZeros": false,
+         "mode": "multi",
+         "sort": "desc"
+        }
+       },
+       "fieldConfig": {
+        "defaults": {
+         "unit": "bytes",
+         "thresholds": {
+          "mode": "absolute",
+          "steps": [
+           {
+            "value": 0,
+            "color": "green"
+           }
+          ]
+         },
+         "color": {
+          "mode": "palette-classic"
+         },
+         "custom": {
+          "axisBorderShow": false,
+          "axisCenteredZero": false,
+          "axisColorMode": "text",
+          "axisLabel": "",
+          "axisPlacement": "auto",
+          "barAlignment": 0,
+          "barWidthFactor": 0.6,
+          "drawStyle": "line",
+          "fillOpacity": 10,
+          "gradientMode": "none",
+          "hideFrom": {
+           "legend": false,
+           "tooltip": false,
+           "viz": false
+          },
+          "insertNulls": false,
+          "lineInterpolation": "linear",
+          "lineWidth": 1,
+          "pointSize": 5,
+          "scaleDistribution": {
+           "type": "linear"
+          },
+          "showPoints": "never",
+          "showValues": false,
+          "spanNulls": false,
+          "stacking": {
+           "group": "A",
+           "mode": "normal"
+          },
+          "thresholdsStyle": {
+           "mode": "off"
+          }
+         }
+        },
+        "overrides": []
+       }
+      }
+     }
+    }
+   },
+   "panel-8": {
+    "kind": "Panel",
+    "spec": {
+     "id": 8,
+     "title": "容器磁盘 IO",
+     "description": "",
+     "links": [],
+     "data": {
+      "kind": "QueryGroup",
+      "spec": {
+       "queries": [
+        {
+         "kind": "PanelQuery",
+         "spec": {
+          "query": {
+           "kind": "DataQuery",
+           "group": "prometheus",
+           "version": "v0",
+           "datasource": {
+            "name": "${DS_PROMETHEUS}"
+           },
+           "spec": {
+            "editorMode": "code",
+            "expr": "sum by (name) (rate(lxc_container_io_read_bytes_total{name=~\"$name\"}[$__rate_interval]))",
+            "legendFormat": "{{name}} 读",
+            "range": true
+           }
+          },
+          "refId": "A",
+          "hidden": false
+         }
+        },
+        {
+         "kind": "PanelQuery",
+         "spec": {
+          "query": {
+           "kind": "DataQuery",
+           "group": "prometheus",
+           "version": "v0",
+           "datasource": {
+            "name": "${DS_PROMETHEUS}"
+           },
+           "spec": {
+            "editorMode": "code",
+            "expr": "sum by (name) (rate(lxc_container_io_write_bytes_total{name=~\"$name\"}[$__rate_interval]))",
+            "legendFormat": "{{name}} 写",
+            "range": true
+           }
+          },
+          "refId": "B",
+          "hidden": false
+         }
+        }
+       ],
+       "transformations": [],
+       "queryOptions": {}
+      }
+     },
+     "vizConfig": {
+      "kind": "VizConfig",
+      "group": "timeseries",
+      "version": "13.2.2",
+      "spec": {
+       "options": {
+        "legend": {
+         "calcs": [
+          "mean",
+          "max",
+          "lastNotNull"
+         ],
+         "displayMode": "table",
+         "placement": "right",
+         "showLegend": true
+        },
+        "tooltip": {
+         "hideZeros": false,
+         "mode": "multi",
+         "sort": "desc"
+        }
+       },
+       "fieldConfig": {
+        "defaults": {
+         "unit": "Bps",
+         "thresholds": {
+          "mode": "absolute",
+          "steps": [
+           {
+            "value": 0,
+            "color": "green"
+           }
+          ]
+         },
+         "color": {
+          "mode": "palette-classic"
+         },
+         "custom": {
+          "axisBorderShow": false,
+          "axisCenteredZero": false,
+          "axisColorMode": "text",
+          "axisLabel": "",
+          "axisPlacement": "auto",
+          "barAlignment": 0,
+          "barWidthFactor": 0.6,
+          "drawStyle": "line",
+          "fillOpacity": 10,
+          "gradientMode": "none",
+          "hideFrom": {
+           "legend": false,
+           "tooltip": false,
+           "viz": false
+          },
+          "insertNulls": false,
+          "lineInterpolation": "linear",
+          "lineWidth": 1,
+          "pointSize": 5,
+          "scaleDistribution": {
+           "type": "linear"
+          },
+          "showPoints": "never",
+          "showValues": false,
+          "spanNulls": false,
+          "stacking": {
+           "group": "A",
+           "mode": "none"
+          },
+          "thresholdsStyle": {
+           "mode": "off"
+          }
+         }
+        },
+        "overrides": []
+       }
+      }
+     }
+    }
+   },
+   "panel-9": {
+    "kind": "Panel",
+    "spec": {
+     "id": 9,
+     "title": "容器网络",
+     "description": "",
+     "links": [],
+     "data": {
+      "kind": "QueryGroup",
+      "spec": {
+       "queries": [
+        {
+         "kind": "PanelQuery",
+         "spec": {
+          "query": {
+           "kind": "DataQuery",
+           "group": "prometheus",
+           "version": "v0",
+           "datasource": {
+            "name": "${DS_PROMETHEUS}"
+           },
+           "spec": {
+            "editorMode": "code",
+            "expr": "sum by (name) (rate(lxc_container_network_receive_bytes_total{name=~\"$name\"}[$__rate_interval]))",
+            "legendFormat": "{{name}} 入",
+            "range": true
+           }
+          },
+          "refId": "A",
+          "hidden": false
+         }
+        },
+        {
+         "kind": "PanelQuery",
+         "spec": {
+          "query": {
+           "kind": "DataQuery",
+           "group": "prometheus",
+           "version": "v0",
+           "datasource": {
+            "name": "${DS_PROMETHEUS}"
+           },
+           "spec": {
+            "editorMode": "code",
+            "expr": "sum by (name) (rate(lxc_container_network_transmit_bytes_total{name=~\"$name\"}[$__rate_interval]))",
+            "legendFormat": "{{name}} 出",
+            "range": true
+           }
+          },
+          "refId": "B",
+          "hidden": false
+         }
+        }
+       ],
+       "transformations": [],
+       "queryOptions": {}
+      }
+     },
+     "vizConfig": {
+      "kind": "VizConfig",
+      "group": "timeseries",
+      "version": "13.2.2",
+      "spec": {
+       "options": {
+        "legend": {
+         "calcs": [
+          "mean",
+          "max",
+          "lastNotNull"
+         ],
+         "displayMode": "table",
+         "placement": "right",
+         "showLegend": true
+        },
+        "tooltip": {
+         "hideZeros": false,
+         "mode": "multi",
+         "sort": "desc"
+        }
+       },
+       "fieldConfig": {
+        "defaults": {
+         "unit": "Bps",
+         "thresholds": {
+          "mode": "absolute",
+          "steps": [
+           {
+            "value": 0,
+            "color": "green"
+           }
+          ]
+         },
+         "color": {
+          "mode": "palette-classic"
+         },
+         "custom": {
+          "axisBorderShow": false,
+          "axisCenteredZero": false,
+          "axisColorMode": "text",
+          "axisLabel": "",
+          "axisPlacement": "auto",
+          "barAlignment": 0,
+          "barWidthFactor": 0.6,
+          "drawStyle": "line",
+          "fillOpacity": 10,
+          "gradientMode": "none",
+          "hideFrom": {
+           "legend": false,
+           "tooltip": false,
+           "viz": false
+          },
+          "insertNulls": false,
+          "lineInterpolation": "linear",
+          "lineWidth": 1,
+          "pointSize": 5,
+          "scaleDistribution": {
+           "type": "linear"
+          },
+          "showPoints": "never",
+          "showValues": false,
+          "spanNulls": false,
+          "stacking": {
+           "group": "A",
+           "mode": "none"
+          },
+          "thresholdsStyle": {
+           "mode": "off"
+          }
+         }
+        },
+        "overrides": []
+       }
+      }
+     }
+    }
+   },
+   "panel-10": {
+    "kind": "Panel",
+    "spec": {
+     "id": 10,
+     "title": "容器网络累计（重启后归零）",
+     "description": "",
+     "links": [],
+     "data": {
+      "kind": "QueryGroup",
+      "spec": {
+       "queries": [
+        {
+         "kind": "PanelQuery",
+         "spec": {
+          "query": {
+           "kind": "DataQuery",
+           "group": "prometheus",
+           "version": "v0",
+           "datasource": {
+            "name": "${DS_PROMETHEUS}"
+           },
+           "spec": {
+            "editorMode": "code",
+            "expr": "sum by (name) (lxc_container_network_receive_bytes_total)",
+            "legendFormat": "入向",
+            "format": "table",
+            "instant": true,
+            "range": false
+           }
+          },
+          "refId": "A",
+          "hidden": false
+         }
+        },
+        {
+         "kind": "PanelQuery",
+         "spec": {
+          "query": {
+           "kind": "DataQuery",
+           "group": "prometheus",
+           "version": "v0",
+           "datasource": {
+            "name": "${DS_PROMETHEUS}"
+           },
+           "spec": {
+            "editorMode": "code",
+            "expr": "sum by (name) (lxc_container_network_transmit_bytes_total)",
+            "legendFormat": "出向",
+            "format": "table",
+            "instant": true,
+            "range": false
+           }
+          },
+          "refId": "B",
+          "hidden": false
+         }
+        }
+       ],
+       "transformations": [
+        {
+         "kind": "Transformation",
+         "group": "labelsToFields",
+         "spec": {
+          "options": {
+           "mode": "columns"
+          }
+         }
+        },
+        {
+         "kind": "Transformation",
+         "group": "merge",
+         "spec": {
+          "options": {}
+         }
+        },
+        {
+         "kind": "Transformation",
+         "group": "organize",
+         "spec": {
+          "options": {
+           "excludeByName": {
+            "Time": true,
+            "job": true,
+            "instance": true,
+            "exported_instance": true
+           },
+           "renameByName": {
+            "name": "容器",
+            "Value #A": "入向",
+            "Value #B": "出向"
+           }
+          }
+         }
+        }
+       ],
+       "queryOptions": {}
+      }
+     },
+     "vizConfig": {
+      "kind": "VizConfig",
+      "group": "table",
+      "version": "13.2.2",
+      "spec": {
+       "options": {
+        "cellHeight": "sm",
+        "showHeader": true,
+        "sortBy": [
+         {
+          "desc": true,
+          "displayName": "本月入向"
+         }
+        ]
+       },
+       "fieldConfig": {
+        "defaults": {
+         "unit": "short",
+         "thresholds": {
+          "mode": "absolute",
+          "steps": [
+           {
+            "value": 0,
+            "color": "green"
+           }
+          ]
+         },
+         "color": {
+          "mode": "thresholds"
+         },
+         "custom": {
+          "align": "auto",
+          "cellOptions": {
+           "type": "auto"
+          },
+          "footer": {
+           "reducers": [
+            "sum"
+           ]
+          },
+          "inspect": false
+         }
+        },
+        "overrides": [
+         {
+          "matcher": {
+           "id": "byName",
+           "options": "容器"
+          },
+          "properties": [
+           {
+            "id": "unit",
+            "value": "string"
+           }
+          ]
+         },
+         {
+          "matcher": {
+           "id": "byName",
+           "options": "入向"
+          },
+          "properties": [
+           {
+            "id": "unit",
+            "value": "bytes"
+           }
+          ]
+         },
+         {
+          "matcher": {
+           "id": "byName",
+           "options": "出向"
+          },
+          "properties": [
+           {
+            "id": "unit",
+            "value": "bytes"
+           }
+          ]
+         }
+        ]
+       }
+      }
+     }
+    }
+   },
+   "panel-11": {
+    "kind": "Panel",
+    "spec": {
+     "id": 11,
+     "title": "容器 swap",
+     "description": "",
+     "links": [],
+     "data": {
+      "kind": "QueryGroup",
+      "spec": {
+       "queries": [
+        {
+         "kind": "PanelQuery",
+         "spec": {
+          "query": {
+           "kind": "DataQuery",
+           "group": "prometheus",
+           "version": "v0",
+           "datasource": {
+            "name": "${DS_PROMETHEUS}"
+           },
+           "spec": {
+            "editorMode": "code",
+            "expr": "lxc_container_swap_bytes{name=~\"$name\"}",
+            "legendFormat": "{{name}}",
+            "range": true
+           }
+          },
+          "refId": "A",
+          "hidden": false
+         }
+        }
+       ],
+       "transformations": [],
+       "queryOptions": {}
+      }
+     },
+     "vizConfig": {
+      "kind": "VizConfig",
+      "group": "timeseries",
+      "version": "13.2.2",
+      "spec": {
+       "options": {
+        "legend": {
+         "calcs": [
+          "mean",
+          "max",
+          "lastNotNull"
+         ],
+         "displayMode": "table",
+         "placement": "right",
+         "showLegend": true
+        },
+        "tooltip": {
+         "hideZeros": false,
+         "mode": "multi",
+         "sort": "desc"
+        }
+       },
+       "fieldConfig": {
+        "defaults": {
+         "unit": "bytes",
+         "thresholds": {
+          "mode": "absolute",
+          "steps": [
+           {
+            "value": 0,
+            "color": "green"
+           }
+          ]
+         },
+         "color": {
+          "mode": "palette-classic"
+         },
+         "custom": {
+          "axisBorderShow": false,
+          "axisCenteredZero": false,
+          "axisColorMode": "text",
+          "axisLabel": "",
+          "axisPlacement": "auto",
+          "barAlignment": 0,
+          "barWidthFactor": 0.6,
+          "drawStyle": "line",
+          "fillOpacity": 10,
+          "gradientMode": "none",
+          "hideFrom": {
+           "legend": false,
+           "tooltip": false,
+           "viz": false
+          },
+          "insertNulls": false,
+          "lineInterpolation": "linear",
+          "lineWidth": 1,
+          "pointSize": 5,
+          "scaleDistribution": {
+           "type": "linear"
+          },
+          "showPoints": "never",
+          "showValues": false,
+          "spanNulls": false,
+          "stacking": {
+           "group": "A",
+           "mode": "none"
+          },
+          "thresholdsStyle": {
+           "mode": "off"
+          }
+         }
+        },
+        "overrides": []
+       }
+      }
+     }
+    }
+   }
+  },
+  "layout": {
+   "kind": "GridLayout",
+   "spec": {
+    "items": [
+     {
+      "kind": "GridLayoutItem",
+      "spec": {
+       "x": 0,
+       "y": 0,
+       "width": 5,
+       "height": 4,
+       "element": {
+        "kind": "ElementReference",
+        "name": "panel-1"
+       }
+      }
+     },
+     {
+      "kind": "GridLayoutItem",
+      "spec": {
+       "x": 5,
+       "y": 0,
+       "width": 6,
+       "height": 4,
+       "element": {
+        "kind": "ElementReference",
+        "name": "panel-2"
+       }
+      }
+     },
+     {
+      "kind": "GridLayoutItem",
+      "spec": {
+       "x": 11,
+       "y": 0,
+       "width": 6,
+       "height": 4,
+       "element": {
+        "kind": "ElementReference",
+        "name": "panel-3"
+       }
+      }
+     },
+     {
+      "kind": "GridLayoutItem",
+      "spec": {
+       "x": 0,
+       "y": 4,
+       "width": 13,
+       "height": 7,
+       "element": {
+        "kind": "ElementReference",
+        "name": "panel-4"
+       }
+      }
+     },
+     {
+      "kind": "GridLayoutItem",
+      "spec": {
+       "x": 13,
+       "y": 4,
+       "width": 11,
+       "height": 7,
+       "element": {
+        "kind": "ElementReference",
+        "name": "panel-5"
+       }
+      }
+     },
+     {
+      "kind": "GridLayoutItem",
+      "spec": {
+       "x": 0,
+       "y": 11,
+       "width": 12,
+       "height": 7,
+       "element": {
+        "kind": "ElementReference",
+        "name": "panel-6"
+       }
+      }
+     },
+     {
+      "kind": "GridLayoutItem",
+      "spec": {
+       "x": 12,
+       "y": 11,
+       "width": 12,
+       "height": 7,
+       "element": {
+        "kind": "ElementReference",
+        "name": "panel-7"
+       }
+      }
+     },
+     {
+      "kind": "GridLayoutItem",
+      "spec": {
+       "x": 0,
+       "y": 18,
+       "width": 12,
+       "height": 7,
+       "element": {
+        "kind": "ElementReference",
+        "name": "panel-8"
+       }
+      }
+     },
+     {
+      "kind": "GridLayoutItem",
+      "spec": {
+       "x": 12,
+       "y": 18,
+       "width": 12,
+       "height": 7,
+       "element": {
+        "kind": "ElementReference",
+        "name": "panel-9"
+       }
+      }
+     },
+     {
+      "kind": "GridLayoutItem",
+      "spec": {
+       "x": 0,
+       "y": 25,
+       "width": 12,
+       "height": 7,
+       "element": {
+        "kind": "ElementReference",
+        "name": "panel-10"
+       }
+      }
+     },
+     {
+      "kind": "GridLayoutItem",
+      "spec": {
+       "x": 12,
+       "y": 25,
+       "width": 12,
+       "height": 6,
+       "element": {
+        "kind": "ElementReference",
+        "name": "panel-11"
+       }
+      }
+     }
+    ]
+   }
+  },
+  "links": [],
+  "liveNow": false,
+  "preload": false,
+  "tags": [
+   "LXC",
+   "lxc_exporter"
+  ],
+  "timeSettings": {
+   "timezone": "browser",
+   "from": "now-6h",
+   "to": "now",
+   "autoRefresh": "30s",
+   "autoRefreshIntervals": [
+    "5s",
+    "10s",
+    "30s",
+    "1m",
+    "5m",
+    "15m",
+    "30m",
+    "1h",
+    "2h",
+    "1d"
+   ],
+   "hideTimepicker": false,
+   "fiscalYearStartMonth": 0
+  },
+  "title": "LXC 容器（debnas）",
+  "variables": [
+   {
+    "kind": "DatasourceVariable",
+    "spec": {
+     "name": "DS_PROMETHEUS",
+     "pluginId": "prometheus",
+     "refresh": "onDashboardLoad",
+     "regex": "",
+     "current": {
+      "text": "prometheus",
+      "value": "afsv2mm9jz94we"
+     },
+     "options": [],
+     "multi": false,
+     "includeAll": false,
+     "label": "Prometheus",
+     "hide": "dontHide",
+     "skipUrlSync": false,
+     "allowCustomValue": true
+    }
+   },
+   {
+    "kind": "QueryVariable",
+    "spec": {
+     "name": "name",
+     "label": "容器",
+     "hide": "dontHide",
+     "refresh": "onTimeRangeChanged",
+     "skipUrlSync": false,
+     "multi": true,
+     "includeAll": true,
+     "allValue": ".*",
+     "regex": "",
+     "regexApplyTo": "value",
+     "sort": "alphabeticalAsc",
+     "current": {
+      "text": "All",
+      "value": [
+       "$__all"
+      ]
+     },
+     "query": {
+      "kind": "DataQuery",
+      "group": "prometheus",
+      "version": "v0",
+      "datasource": {
+       "name": "${DS_PROMETHEUS}"
+      },
+      "spec": {
+       "query": "label_values(lxc_container_up, name)",
+       "refId": "StandardVariableQuery"
+      }
+     }
+    }
+   }
+  ]
+ }
+}

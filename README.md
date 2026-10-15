@@ -209,3 +209,30 @@ lxc/                   LXC 容器发现与 cgroup/proc 指标采集与解析
 util/                  最小工具函数：数值解析、正则筛选
 instance/              hostname 识别与 instance 标签改写
 ```
+
+## Grafana 面板
+
+面板标题 **LXC 容器（debnas）**（uid `lxc-monitor`，11 块）。`grafana/` 下两份是同一套面板，粘的地方不同：
+
+| 文件 | 用在哪 |
+| --- | --- |
+| `grafana/dashboard.json` | Dashboards → New → **Import**（v1，Grafana 会自动迁移成 v2） |
+| `grafana/dashboard-v2.json` | Dashboard settings → **JSON Model**（v2，Grafana 13 的编辑器只认这个格式） |
+
+导入时把 `DS_PROMETHEUS` 绑到自己的 Prometheus 数据源。面板清单：
+
+| # | 面板 | 类型 | PromQL |
+| --- | --- | --- | --- |
+| 1 | 运行中的容器 | stat | `count(lxc_container_up)` |
+| 2 | 容器内存合计 | stat | `sum(lxc_container_memory_bytes)` |
+| 3 | CPU 被限流次数（1h） | stat | `sum(round(increase(lxc_container_cpu_nr_throttled_total[1h])))` |
+| 4 | 容器概览 | table | `lxc_container_memory_bytes<br>lxc_container_pids<br>sum by (name) (rate(lxc_container_cpu_seconds_total[5m]))` |
+| 5 | 容器 CPU 使用（核数） | timeseries | `sum by (name) (rate(lxc_container_cpu_seconds_total{name=~"$name"}[$__rate_interval]))` |
+| 6 | 容器内存 | timeseries | `lxc_container_memory_bytes{name=~"$name"}` |
+| 7 | 容器内存构成 | timeseries | `sum by (kind) (lxc_container_memory_stat_bytes{name=~"$name"})` |
+| 8 | 容器磁盘 IO | timeseries | `sum by (name) (rate(lxc_container_io_read_bytes_total{name=~"$name"}[$__rate_interval]))<br>sum by (name) (rate(lxc_container_io_write_bytes_total{name=~"$name"}[$__rate_interval]))` |
+| 9 | 容器网络 | timeseries | `sum by (name) (rate(lxc_container_network_receive_bytes_total{name=~"$name"}[$__rate_interval]))<br>sum by (name) (rate(lxc_container_network_transmit_bytes_total{name=~"$name"}[$__rate_interval]))` |
+| 10 | 容器网络累计（重启后归零） | table | `sum by (name) (lxc_container_network_receive_bytes_total)<br>sum by (name) (lxc_container_network_transmit_bytes_total)` |
+| 11 | 容器 swap | timeseries | `lxc_container_swap_bytes{name=~"$name"}` |
+
+变量：DS_PROMETHEUS、name。
