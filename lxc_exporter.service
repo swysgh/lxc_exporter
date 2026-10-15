@@ -9,8 +9,8 @@ Type=simple
 
 # 需要读取 cgroup v2（/sys/fs/cgroup）与容器进程的 /proc/<pid>/net/dev，
 # 因此服务以 root 运行。
-ExecStart=/usr/local/bin/lxc_exporter \
-  -web.listen-address=:9328
+# 所有可调项都放在 /etc/lxc_exporter/config.json（字段见仓库 config.example.json）。
+ExecStart=/usr/local/bin/lxc_exporter -config /etc/lxc_exporter/config.json
 
 ExecReload=/bin/kill -HUP $MAINPID
 Restart=always
