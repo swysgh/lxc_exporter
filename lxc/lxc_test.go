@@ -310,3 +310,40 @@ func TestNewDefaults(t *testing.T) {
 		t.Errorf("Timeout = %v", e.opts.Timeout)
 	}
 }
+
+// TestNestedCgroupNetwork 覆盖：容器 cgroup 根上的 cgroup.procs 为空
+// （进程在 init.scope 这类子 cgroup 里）时，仍能取到 pid 并采到网络指标。
+// 实测 debnas 上就是这个形态，早期实现只读根 cgroup.procs，导致所有容器都没有网络指标。
+func TestNestedCgroupNetwork(t *testing.T) {
+	e := New(Options{
+		CgroupRoot:    "testdata/cgroup-nested",
+		ProcRoot:      "testdata/proc",
+		Network:       true,
+		NetworkFilter: mustFilter(t, "", DefaultNetworkExcludeRegex),
+	})
+	got := gather(t, e)
+
+	if v := got["lxc_container_up"]["name=nested,"]; v != 1 {
+		t.Fatalf("up{nested} = %v，期望 1", v)
+	}
+	if v := got["lxc_container_network_receive_bytes_total"]["device=eth0,name=nested,"]; v != 1234567 {
+		t.Errorf("嵌套 cgroup 下 net recv bytes = %v，期望 1234567", v)
+	}
+	if v := got["lxc_container_network_transmit_bytes_total"]["device=eth0,name=nested,"]; v != 7654321 {
+		t.Errorf("嵌套 cgroup 下 net trans bytes = %v，期望 7654321", v)
+	}
+	// 默认网卡筛选要把 lo 这类虚拟网卡排掉（fixture 里 lo 也存在）。
+	if _, ok := got["lxc_container_network_receive_bytes_total"]["device=lo,name=nested,"]; ok {
+		t.Errorf("lo 应被默认网卡筛选排除")
+	}
+}
+
+// TestFirstPID 直接测递归查找：根 cgroup.procs 为空时要往下找到 init.scope 里的 pid。
+func TestFirstPID(t *testing.T) {
+	if pid := firstPID("testdata/cgroup-nested/lxc.payload.nested", 0); pid != "7777" {
+		t.Errorf("firstPID = %q，期望 7777", pid)
+	}
+	if pid := firstPID("testdata/cgroup-nested/lxc.payload.does-not-exist", 0); pid != "" {
+		t.Errorf("目录不存在时期望空串，得到 %q", pid)
+	}
+}

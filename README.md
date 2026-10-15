@@ -17,7 +17,7 @@
 | 内存 | `memory.current` / `memory.max` / `memory.stat` / swap | 开启 | 始终启用 |
 | 进程数 | `pids.current` / `pids.max` | 开启 | 始终启用 |
 | 块 IO | `io.stat`：按 `maj:min` 的读写字节与次数 | 开启 | 始终启用 |
-| 网络 | 容器进程的 `/proc/<pid>/net/dev`：收发字节/包/错误/丢包 | 开启 | `-lxc.network` |
+| 网络 | 容器进程的 `/proc/<pid>/net/dev`：收发字节/包/错误/丢包（**支持按网卡筛选**） | 开启 | `-lxc.network` |
 | 运行时 | `go_*`、`process_*`（exporter 自身） | 开启 | 始终启用 |
 
 监听端口默认 **9328**，路径 `/metrics`。
@@ -72,6 +72,7 @@ sudo make install-service    # 安装并启动
 | `-lxc.include` | 空 | 正则，只导出匹配的容器名 |
 | `-lxc.exclude` | 空 | 正则，导出时排除匹配的容器名 |
 | `-lxc.network` | `true` | 是否采集容器网卡流量 |
+| `-lxc.network-exclude` | `^(lo\|veth.*\|docker[0-9]*\|br-.*\|virbr.*\|tun[0-9]*\|tap[0-9]*\|zt.*\|wg[0-9]*)$` | 网卡名排除正则；容器里跑 docker 会带出大量 `br-*`/`veth*` 序列，默认排掉；传空字符串可采集全部 |
 | `-command-timeout` | `20s` | 读取超时时间 |
 
 `-lxc.include` / `-lxc.exclude` 是 Go 正则，非法正则会在启动时报错退出。
@@ -100,7 +101,8 @@ sudo make install-service    # 安装并启动
 目录名必须形如 `lxc.payload.<name>`，`lxc.monitor.*` / `lxc.pivot` 等非容器条目会被排除。
 **已停止的容器没有该目录，不会为它们保留序列**（不是 `up=0`）。
 
-网络采集从 `cgroup.procs` 取第一个 pid，再读 `/proc/<pid>/net/dev`；
+网络采集先在容器 cgroup 里找第一个 pid（**cgroup 根上的 `cgroup.procs` 常为空** —— 容器内 systemd 把进程放在
+`init.scope/`、`system.slice/` 等子 cgroup 里，所以要往下递归找），再读 `/proc/<pid>/net/dev`；
 该 pid 在容器的 netns 里，宿主读它拿到的是容器视角的计数。读不到时跳过网络指标，不影响其它指标。
 
 ## 指标一览

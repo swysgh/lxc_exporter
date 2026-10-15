@@ -390,6 +390,7 @@
           "options": {
            "excludeByName": {
             "Time": true,
+            "__name__": true,
             "job": true,
             "instance": true,
             "exported_instance": true
@@ -443,9 +444,8 @@
            "type": "auto"
           },
           "footer": {
-           "reducers": [
-            "sum"
-           ]
+           "show": false,
+           "reducers": []
           },
           "inspect": false
          }
@@ -1204,6 +1204,7 @@
           "options": {
            "excludeByName": {
             "Time": true,
+            "__name__": true,
             "job": true,
             "instance": true,
             "exported_instance": true
@@ -1256,9 +1257,8 @@
            "type": "auto"
           },
           "footer": {
-           "reducers": [
-            "sum"
-           ]
+           "show": false,
+           "reducers": []
           },
           "inspect": false
          }

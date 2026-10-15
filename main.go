@@ -54,9 +54,10 @@ type flags struct {
 	cgroupRoot string
 	procRoot   string
 
-	lxcInclude string
-	lxcExclude string
-	lxcNetwork bool
+	lxcInclude        string
+	lxcExclude        string
+	lxcNetwork        bool
+	lxcNetworkExclude string
 }
 
 // fileConfig 对应 -config 指定的 JSON 配置文件，字段一律使用指针。
@@ -70,9 +71,10 @@ type fileConfig struct {
 	CgroupRoot *string `json:"cgroup_root"`
 	ProcRoot   *string `json:"proc_root"`
 
-	LxcInclude *string `json:"lxc_include"`
-	LxcExclude *string `json:"lxc_exclude"`
-	LxcNetwork *bool   `json:"lxc_network"`
+	LxcInclude        *string `json:"lxc_include"`
+	LxcExclude        *string `json:"lxc_exclude"`
+	LxcNetwork        *bool   `json:"lxc_network"`
+	LxcNetworkExclude *string `json:"lxc_network_exclude"`
 }
 
 // registerFlags 定义全部命令行参数。
@@ -101,6 +103,8 @@ func registerFlags(fs *flag.FlagSet, f *flags) {
 		"容器名排除正则：导出时不包含匹配的容器")
 	fs.BoolVar(&f.lxcNetwork, "lxc.network", true,
 		"采集容器网卡流量（需要读取容器进程的 /proc/<pid>/net/dev）")
+	fs.StringVar(&f.lxcNetworkExclude, "lxc.network-exclude", lxc.DefaultNetworkExcludeRegex,
+		"网卡名排除正则；传空字符串可采集全部网卡（容器内 docker 会带来大量 br-*/veth* 序列）")
 }
 
 // loadConfig 读取并解析 JSON 配置文件，未知键会报错。
@@ -155,6 +159,7 @@ func mergeConfig(fs *flag.FlagSet, f *flags, cfg *fileConfig) error {
 	setStr("lxc.include", &f.lxcInclude, cfg.LxcInclude)
 	setStr("lxc.exclude", &f.lxcExclude, cfg.LxcExclude)
 	setBool("lxc.network", &f.lxcNetwork, cfg.LxcNetwork)
+	setStr("lxc.network-exclude", &f.lxcNetworkExclude, cfg.LxcNetworkExclude)
 
 	return nil
 }
@@ -244,6 +249,10 @@ func main() {
 	if err != nil {
 		log.Fatalf("容器筛选规则无效: %v", err)
 	}
+	networkFilter, err := util.NewFilter("", f.lxcNetworkExclude)
+	if err != nil {
+		log.Fatalf("网卡筛选规则无效: %v", err)
+	}
 
 	// ---- hostname 与 instance 标签 ----
 	host := instance.Detect(f.hostname)
@@ -257,11 +266,12 @@ func main() {
 	enabled := []string{"lxc"}
 
 	lxcExporter := lxc.New(lxc.Options{
-		CgroupRoot: f.cgroupRoot,
-		ProcRoot:   f.procRoot,
-		Filter:     containerFilter,
-		Network:    f.lxcNetwork,
-		Timeout:    f.commandTimeout,
+		CgroupRoot:    f.cgroupRoot,
+		ProcRoot:      f.procRoot,
+		Filter:        containerFilter,
+		Network:       f.lxcNetwork,
+		NetworkFilter: networkFilter,
+		Timeout:       f.commandTimeout,
 	})
 	registry.MustRegister(lxcExporter)
 	log.Printf("LXC 采集: %s", lxcExporter)
@@ -330,6 +340,9 @@ func main() {
 	}
 	log.Printf("instance 标签: %s", host)
 	log.Printf("cgroup-root=%s proc-root=%s lxc.network=%v", f.cgroupRoot, f.procRoot, f.lxcNetwork)
+	if f.lxcNetwork {
+		log.Printf("网卡筛选: %s", networkFilter)
+	}
 	log.Printf("容器筛选: %s", containerFilter)
 	log.Printf("command-timeout: %s", f.commandTimeout)
 	log.Printf("已启用模块: %s", strings.Join(enabled, ", "))

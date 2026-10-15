@@ -4,11 +4,10 @@
   "auth_token": "",
   "hostname": "",
   "command_timeout": "20s",
-
   "cgroup_root": "/sys/fs/cgroup",
   "proc_root": "/proc",
-
   "lxc_include": "",
   "lxc_exclude": "",
-  "lxc_network": true
+  "lxc_network": true,
+  "lxc_network_exclude": "^(lo|veth.*|docker[0-9]*|br-.*|virbr.*|tun[0-9]*|tap[0-9]*|zt.*|wg[0-9]*)$"
 }

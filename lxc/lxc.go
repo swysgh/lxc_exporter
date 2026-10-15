@@ -255,6 +255,10 @@ type Options struct {
 	Filter *util.Filter
 	// Network 为 true 时采集容器网卡流量。
 	Network bool
+	// NetworkFilter 用于筛选网卡名（nil 表示全部）。
+	// 容器里往往还跑着 docker，会带出 br-*/veth* 一堆虚拟网卡，
+	// 默认按 DefaultNetworkExcludeRegex 排除，避免序列数爆掉。
+	NetworkFilter *util.Filter
 	// Timeout 预留给未来的读取超时控制。
 	Timeout time.Duration
 }
@@ -483,22 +487,24 @@ func (e *Exporter) readContainer(name string) (ContainerStats, error) {
 	return stats, nil
 }
 
-// readNetwork 通过 cgroup.procs 取容器内第一个 pid，
-// 再读 /proc/<pid>/net/dev 拿到容器视角的网卡计数。
+// DefaultNetworkExcludeRegex 是默认排除的网卡正则（与 node_exporter 的默认口径一致）：
+// 回环、veth、docker 网桥、tun/tap 等虚拟网卡没有监控意义，且数量随容器内 docker 网络增长。
+const DefaultNetworkExcludeRegex = `^(lo|veth.*|docker[0-9]*|br-.*|virbr.*|tun[0-9]*|tap[0-9]*|zt.*|wg[0-9]*)$`
+
+// maxCgroupDepth 是递归查找容器进程时允许的最大子 cgroup 深度。
+// 容器内的 systemd 会把进程放进 init.scope / system.slice/xxx.service 这类子 cgroup，
+// 实测两层就够，留点余量。
+const maxCgroupDepth = 6
+
+// readNetwork 取容器内第一个 pid，再读 /proc/<pid>/net/dev 拿到容器视角的网卡计数。
+//
+// 容器 cgroup 根上的 cgroup.procs 经常是空的（进程在子 cgroup 里，实测 debnas 的
+// lxc.payload.<name>/cgroup.procs 为 0 行，pid 在 init.scope/cgroup.procs），
+// 所以要往下递归找第一个有 pid 的 cgroup，否则网络指标会整体缺失。
 //
 // 读不到时返回 nil（不影响其它指标）。
 func (e *Exporter) readNetwork(dir string) map[string]NetCounters {
-	content, err := readTrim(filepath.Join(dir, "cgroup.procs"))
-	if err != nil {
-		return nil
-	}
-	var pid string
-	for _, line := range strings.Split(content, "\n") {
-		if line = strings.TrimSpace(line); line != "" {
-			pid = line
-			break
-		}
-	}
+	pid := firstPID(dir, 0)
 	if pid == "" {
 		return nil
 	}
@@ -506,7 +512,42 @@ func (e *Exporter) readNetwork(dir string) map[string]NetCounters {
 	if err != nil {
 		return nil
 	}
-	return ParseNetDev(netDev)
+	counters := ParseNetDev(netDev)
+	if e.opts.NetworkFilter != nil {
+		for name := range counters {
+			if !e.opts.NetworkFilter.Match(name) {
+				delete(counters, name)
+			}
+		}
+	}
+	return counters
+}
+
+// firstPID 在 cgroup 目录（含子目录，最多 maxCgroupDepth 层）里找第一个进程 pid。
+func firstPID(dir string, depth int) string {
+	if depth > maxCgroupDepth {
+		return ""
+	}
+	if content, err := readTrim(filepath.Join(dir, "cgroup.procs")); err == nil {
+		for _, line := range strings.Split(content, "\n") {
+			if line = strings.TrimSpace(line); line != "" {
+				return line
+			}
+		}
+	}
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		return ""
+	}
+	for _, ent := range entries {
+		if !ent.IsDir() {
+			continue
+		}
+		if pid := firstPID(filepath.Join(dir, ent.Name()), depth+1); pid != "" {
+			return pid
+		}
+	}
+	return ""
 }
 
 // emit 输出单个容器的全部指标。
