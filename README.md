@@ -225,17 +225,17 @@ instance/              hostname 识别与 instance 标签改写
 
 | # | 面板 | 类型 | PromQL |
 | --- | --- | --- | --- |
-| 1 | 运行中的容器 | stat | `count(lxc_container_up)` |
-| 2 | 容器内存合计 | stat | `sum(lxc_container_memory_bytes)` |
-| 3 | CPU 被限流次数（1h） | stat | `sum(round(increase(lxc_container_cpu_nr_throttled_total[1h])))` |
-| 4 | 容器概览 | table | `lxc_container_memory_bytes<br>lxc_container_pids<br>sum by (instance, name) (rate(lxc_container_cpu_seconds_total[5m]))` |
-| 5 | 容器 CPU 使用（核数） | timeseries | `sum by (name) (rate(lxc_container_cpu_seconds_total{name=~"$name"}[$__rate_interval]))` |
-| 6 | 容器内存 | timeseries | `lxc_container_memory_bytes{name=~"$name"}` |
-| 7 | 容器内存构成 | timeseries | `sum by (kind) (lxc_container_memory_stat_bytes{name=~"$name"})` |
-| 8 | 容器磁盘 IO | timeseries | `sum by (name) (rate(lxc_container_io_read_bytes_total{name=~"$name"}[$__rate_interval]))<br>sum by (name) (rate(lxc_container_io_write_bytes_total{name=~"$name"}[$__rate_interval]))` |
-| 9 | 容器网络 | timeseries | `sum by (name) (rate(lxc_container_network_receive_bytes_total{name=~"$name"}[$__rate_interval]))<br>sum by (name) (rate(lxc_container_network_transmit_bytes_total{name=~"$name"}[$__rate_interval]))` |
-| 10 | 容器网络累计（重启后归零） | table | `sum without (device) (lxc_container_network_receive_bytes_total)<br>sum without (device) (lxc_container_network_transmit_bytes_total)` |
-| 11 | 容器 swap | timeseries | `lxc_container_swap_bytes{name=~"$name"}` |
+| 1 | 运行中的容器 | stat | `count(lxc_container_up{instance!~"[0-9.]+:[0-9]+"})` |
+| 2 | 容器内存合计 | stat | `sum(lxc_container_memory_bytes{instance!~"[0-9.]+:[0-9]+"})` |
+| 3 | CPU 被限流次数（1h） | stat | `sum(round(increase(lxc_container_cpu_nr_throttled_total{instance!~"[0-9.]+:[0-9]+"}[1h])))` |
+| 6 | 容器内存 | timeseries | `lxc_container_memory_bytes{name=~"$name",instance!~"[0-9.]+:[0-9]+"}` |
+| 4 | 容器概览 | table | `lxc_container_memory_bytes{instance!~"[0-9.]+:[0-9]+"}<br>lxc_container_pids{instance!~"[0-9.]+:[0-9]+"}<br>sum by (instance, name) (rate(lxc_container_cpu_seconds_total{instance!~"[0-9.]+:[0-9]+"}[5m]))` |
+| 5 | 容器 CPU 使用（核数） | timeseries | `sum by (name) (rate(lxc_container_cpu_seconds_total{name=~"$name",instance!~"[0-9.]+:[0-9]+"}[$__rate_interval]))` |
+| 8 | 容器磁盘 IO | timeseries | `sum by (name) (rate(lxc_container_io_read_bytes_total{name=~"$name",instance!~"[0-9.]+:[0-9]+"}[$__rate_interval]))<br>sum by (name) (rate(lxc_container_io_write_bytes_total{name=~"$name",instance!~"[0-9.]+:[0-9]+"}[$__rate_interval]))` |
+| 9 | 容器网络 | timeseries | `sum by (name) (rate(lxc_container_network_receive_bytes_total{name=~"$name",instance!~"[0-9.]+:[0-9]+"}[$__rate_interval]))<br>sum by (name) (rate(lxc_container_network_transmit_bytes_total{name=~"$name",instance!~"[0-9.]+:[0-9]+"}[$__rate_interval]))` |
+| 10 | 容器网络累计（重启后归零） | table | `sum without (device) (lxc_container_network_receive_bytes_total{instance!~"[0-9.]+:[0-9]+"})<br>sum without (device) (lxc_container_network_transmit_bytes_total{instance!~"[0-9.]+:[0-9]+"})` |
+| 11 | 容器 swap | timeseries | `lxc_container_swap_bytes{name=~"$name",instance!~"[0-9.]+:[0-9]+"}` |
+| 7 | 容器内存构成 | timeseries | `sum by (kind) (lxc_container_memory_stat_bytes{name=~"$name",instance!~"[0-9.]+:[0-9]+"})` |
 
 变量：DS_PROMETHEUS、name。
 

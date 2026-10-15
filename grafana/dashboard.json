@@ -75,7 +75,7 @@
       "type": "prometheus",
       "uid": "${DS_PROMETHEUS}"
      },
-     "expr": "count(lxc_container_up)",
+     "expr": "count(lxc_container_up{instance!~\"[0-9.]+:[0-9]+\"})",
      "instant": true,
      "legendFormat": "容器数",
      "range": false,
@@ -135,7 +135,7 @@
       "type": "prometheus",
       "uid": "${DS_PROMETHEUS}"
      },
-     "expr": "sum(lxc_container_memory_bytes)",
+     "expr": "sum(lxc_container_memory_bytes{instance!~\"[0-9.]+:[0-9]+\"})",
      "instant": true,
      "legendFormat": "合计",
      "range": false,
@@ -200,7 +200,7 @@
       "type": "prometheus",
       "uid": "${DS_PROMETHEUS}"
      },
-     "expr": "sum(round(increase(lxc_container_cpu_nr_throttled_total[1h])))",
+     "expr": "sum(round(increase(lxc_container_cpu_nr_throttled_total{instance!~\"[0-9.]+:[0-9]+\"}[1h])))",
      "instant": true,
      "legendFormat": "限流",
      "range": false,
@@ -301,7 +301,7 @@
       "type": "prometheus",
       "uid": "${DS_PROMETHEUS}"
      },
-     "expr": "lxc_container_memory_bytes{name=~\"$name\"}",
+     "expr": "lxc_container_memory_bytes{name=~\"$name\",instance!~\"[0-9.]+:[0-9]+\"}",
      "legendFormat": "{{name}}",
      "range": true,
      "refId": "A"
@@ -412,7 +412,7 @@
       "type": "prometheus",
       "uid": "${DS_PROMETHEUS}"
      },
-     "expr": "lxc_container_memory_bytes",
+     "expr": "lxc_container_memory_bytes{instance!~\"[0-9.]+:[0-9]+\"}",
      "format": "table",
      "instant": true,
      "legendFormat": "内存",
@@ -424,7 +424,7 @@
       "type": "prometheus",
       "uid": "${DS_PROMETHEUS}"
      },
-     "expr": "lxc_container_pids",
+     "expr": "lxc_container_pids{instance!~\"[0-9.]+:[0-9]+\"}",
      "format": "table",
      "instant": true,
      "legendFormat": "进程数",
@@ -436,7 +436,7 @@
       "type": "prometheus",
       "uid": "${DS_PROMETHEUS}"
      },
-     "expr": "sum by (instance, name) (rate(lxc_container_cpu_seconds_total[5m]))",
+     "expr": "sum by (instance, name) (rate(lxc_container_cpu_seconds_total{instance!~\"[0-9.]+:[0-9]+\"}[5m]))",
      "format": "table",
      "instant": true,
      "legendFormat": "CPU 核数",
@@ -605,7 +605,7 @@
       "type": "prometheus",
       "uid": "${DS_PROMETHEUS}"
      },
-     "expr": "sum by (name) (rate(lxc_container_cpu_seconds_total{name=~\"$name\"}[$__rate_interval]))",
+     "expr": "sum by (name) (rate(lxc_container_cpu_seconds_total{name=~\"$name\",instance!~\"[0-9.]+:[0-9]+\"}[$__rate_interval]))",
      "legendFormat": "{{name}}",
      "range": true,
      "refId": "A"
@@ -705,7 +705,7 @@
       "type": "prometheus",
       "uid": "${DS_PROMETHEUS}"
      },
-     "expr": "sum by (name) (rate(lxc_container_io_read_bytes_total{name=~\"$name\"}[$__rate_interval]))",
+     "expr": "sum by (name) (rate(lxc_container_io_read_bytes_total{name=~\"$name\",instance!~\"[0-9.]+:[0-9]+\"}[$__rate_interval]))",
      "legendFormat": "{{name}} 读",
      "range": true,
      "refId": "A"
@@ -715,7 +715,7 @@
       "type": "prometheus",
       "uid": "${DS_PROMETHEUS}"
      },
-     "expr": "sum by (name) (rate(lxc_container_io_write_bytes_total{name=~\"$name\"}[$__rate_interval]))",
+     "expr": "sum by (name) (rate(lxc_container_io_write_bytes_total{name=~\"$name\",instance!~\"[0-9.]+:[0-9]+\"}[$__rate_interval]))",
      "legendFormat": "{{name}} 写",
      "range": true,
      "refId": "B"
@@ -815,7 +815,7 @@
       "type": "prometheus",
       "uid": "${DS_PROMETHEUS}"
      },
-     "expr": "sum by (name) (rate(lxc_container_network_receive_bytes_total{name=~\"$name\"}[$__rate_interval]))",
+     "expr": "sum by (name) (rate(lxc_container_network_receive_bytes_total{name=~\"$name\",instance!~\"[0-9.]+:[0-9]+\"}[$__rate_interval]))",
      "legendFormat": "{{name}} 入",
      "range": true,
      "refId": "A"
@@ -825,7 +825,7 @@
       "type": "prometheus",
       "uid": "${DS_PROMETHEUS}"
      },
-     "expr": "sum by (name) (rate(lxc_container_network_transmit_bytes_total{name=~\"$name\"}[$__rate_interval]))",
+     "expr": "sum by (name) (rate(lxc_container_network_transmit_bytes_total{name=~\"$name\",instance!~\"[0-9.]+:[0-9]+\"}[$__rate_interval]))",
      "legendFormat": "{{name}} 出",
      "range": true,
      "refId": "B"
@@ -923,7 +923,7 @@
       "type": "prometheus",
       "uid": "${DS_PROMETHEUS}"
      },
-     "expr": "sum without (device) (lxc_container_network_receive_bytes_total)",
+     "expr": "sum without (device) (lxc_container_network_receive_bytes_total{instance!~\"[0-9.]+:[0-9]+\"})",
      "format": "table",
      "instant": true,
      "legendFormat": "入向",
@@ -935,7 +935,7 @@
       "type": "prometheus",
       "uid": "${DS_PROMETHEUS}"
      },
-     "expr": "sum without (device) (lxc_container_network_transmit_bytes_total)",
+     "expr": "sum without (device) (lxc_container_network_transmit_bytes_total{instance!~\"[0-9.]+:[0-9]+\"})",
      "format": "table",
      "instant": true,
      "legendFormat": "出向",
@@ -1095,7 +1095,7 @@
       "type": "prometheus",
       "uid": "${DS_PROMETHEUS}"
      },
-     "expr": "lxc_container_swap_bytes{name=~\"$name\"}",
+     "expr": "lxc_container_swap_bytes{name=~\"$name\",instance!~\"[0-9.]+:[0-9]+\"}",
      "legendFormat": "{{name}}",
      "range": true,
      "refId": "A"
@@ -1195,7 +1195,7 @@
       "type": "prometheus",
       "uid": "${DS_PROMETHEUS}"
      },
-     "expr": "sum by (kind) (lxc_container_memory_stat_bytes{name=~\"$name\"})",
+     "expr": "sum by (kind) (lxc_container_memory_stat_bytes{name=~\"$name\",instance!~\"[0-9.]+:[0-9]+\"})",
      "legendFormat": "{{kind}}",
      "range": true,
      "refId": "A"
@@ -1279,5 +1279,5 @@
  "timezone": "browser",
  "title": "LXC 容器（debnas）",
  "uid": "lxc-monitor",
- "version": 6
+ "version": 7
 }
