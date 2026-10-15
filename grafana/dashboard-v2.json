@@ -354,7 +354,7 @@
            },
            "spec": {
             "editorMode": "code",
-            "expr": "sum by (name) (rate(lxc_container_cpu_seconds_total[5m]))",
+            "expr": "sum by (instance, name) (rate(lxc_container_cpu_seconds_total[5m]))",
             "legendFormat": "CPU 核数",
             "format": "table",
             "instant": true,
@@ -385,6 +385,42 @@
         },
         {
          "kind": "Transformation",
+         "group": "groupBy",
+         "spec": {
+          "options": {
+           "fields": {
+            "instance": {
+             "operation": "groupby",
+             "aggregations": []
+            },
+            "name": {
+             "operation": "groupby",
+             "aggregations": []
+            },
+            "Value #A": {
+             "operation": "aggregate",
+             "aggregations": [
+              "lastNotNull"
+             ]
+            },
+            "Value #B": {
+             "operation": "aggregate",
+             "aggregations": [
+              "lastNotNull"
+             ]
+            },
+            "Value #C": {
+             "operation": "aggregate",
+             "aggregations": [
+              "lastNotNull"
+             ]
+            }
+           }
+          }
+         }
+        },
+        {
+         "kind": "Transformation",
          "group": "organize",
          "spec": {
           "options": {
@@ -399,7 +435,10 @@
             "name": "容器",
             "Value #A": "内存",
             "Value #B": "进程数",
-            "Value #C": "CPU 核数"
+            "Value #C": "CPU 核数",
+            "Value #A (lastNotNull)": "内存",
+            "Value #B (lastNotNull)": "进程数",
+            "Value #C (lastNotNull)": "CPU 核数"
            }
           }
          }
@@ -1145,7 +1184,7 @@
            },
            "spec": {
             "editorMode": "code",
-            "expr": "sum by (name) (lxc_container_network_receive_bytes_total)",
+            "expr": "sum without (device) (lxc_container_network_receive_bytes_total)",
             "legendFormat": "入向",
             "format": "table",
             "instant": true,
@@ -1168,7 +1207,7 @@
            },
            "spec": {
             "editorMode": "code",
-            "expr": "sum by (name) (lxc_container_network_transmit_bytes_total)",
+            "expr": "sum without (device) (lxc_container_network_transmit_bytes_total)",
             "legendFormat": "出向",
             "format": "table",
             "instant": true,
@@ -1199,6 +1238,36 @@
         },
         {
          "kind": "Transformation",
+         "group": "groupBy",
+         "spec": {
+          "options": {
+           "fields": {
+            "instance": {
+             "operation": "groupby",
+             "aggregations": []
+            },
+            "name": {
+             "operation": "groupby",
+             "aggregations": []
+            },
+            "Value #A": {
+             "operation": "aggregate",
+             "aggregations": [
+              "lastNotNull"
+             ]
+            },
+            "Value #B": {
+             "operation": "aggregate",
+             "aggregations": [
+              "lastNotNull"
+             ]
+            }
+           }
+          }
+         }
+        },
+        {
+         "kind": "Transformation",
          "group": "organize",
          "spec": {
           "options": {
@@ -1212,7 +1281,9 @@
            "renameByName": {
             "name": "容器",
             "Value #A": "入向",
-            "Value #B": "出向"
+            "Value #B": "出向",
+            "Value #A (lastNotNull)": "入向",
+            "Value #B (lastNotNull)": "出向"
            }
           }
          }

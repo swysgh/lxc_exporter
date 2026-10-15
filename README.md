@@ -228,13 +228,15 @@ instance/              hostname 识别与 instance 标签改写
 | 1 | 运行中的容器 | stat | `count(lxc_container_up)` |
 | 2 | 容器内存合计 | stat | `sum(lxc_container_memory_bytes)` |
 | 3 | CPU 被限流次数（1h） | stat | `sum(round(increase(lxc_container_cpu_nr_throttled_total[1h])))` |
-| 4 | 容器概览 | table | `lxc_container_memory_bytes<br>lxc_container_pids<br>sum by (name) (rate(lxc_container_cpu_seconds_total[5m]))` |
+| 4 | 容器概览 | table | `lxc_container_memory_bytes<br>lxc_container_pids<br>sum by (instance, name) (rate(lxc_container_cpu_seconds_total[5m]))` |
 | 5 | 容器 CPU 使用（核数） | timeseries | `sum by (name) (rate(lxc_container_cpu_seconds_total{name=~"$name"}[$__rate_interval]))` |
 | 6 | 容器内存 | timeseries | `lxc_container_memory_bytes{name=~"$name"}` |
 | 7 | 容器内存构成 | timeseries | `sum by (kind) (lxc_container_memory_stat_bytes{name=~"$name"})` |
 | 8 | 容器磁盘 IO | timeseries | `sum by (name) (rate(lxc_container_io_read_bytes_total{name=~"$name"}[$__rate_interval]))<br>sum by (name) (rate(lxc_container_io_write_bytes_total{name=~"$name"}[$__rate_interval]))` |
 | 9 | 容器网络 | timeseries | `sum by (name) (rate(lxc_container_network_receive_bytes_total{name=~"$name"}[$__rate_interval]))<br>sum by (name) (rate(lxc_container_network_transmit_bytes_total{name=~"$name"}[$__rate_interval]))` |
-| 10 | 容器网络累计（重启后归零） | table | `sum by (name) (lxc_container_network_receive_bytes_total)<br>sum by (name) (lxc_container_network_transmit_bytes_total)` |
+| 10 | 容器网络累计（重启后归零） | table | `sum without (device) (lxc_container_network_receive_bytes_total)<br>sum without (device) (lxc_container_network_transmit_bytes_total)` |
 | 11 | 容器 swap | timeseries | `lxc_container_swap_bytes{name=~"$name"}` |
 
 变量：DS_PROMETHEUS、name。
+
+表格面板的变换流水线固定为 `labelsToFields → merge → groupBy → organize`（多查询表格必须有 `groupBy`）：各查询是 instant 求值、时间戳各不相同，`merge` 无法按时间把行对齐，会把每个查询的结果摞成独立行块（表现是「进程数」「温度」这类列整块错位、同一维度出现多行）；`groupBy` 按标签列分组、对 `Value #X` 取 `lastNotNull` 才能合并成一行一个维度。分组键要每个查询都存在，且涵盖所有要保留显示的标签列（`groupBy` 会丢掉没列进 `fields` 的字段）。
