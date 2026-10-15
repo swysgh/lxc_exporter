@@ -1,0 +1,14 @@
+{
+  "listen_address": ":9328",
+  "telemetry_path": "/metrics",
+  "auth_token": "",
+  "hostname": "",
+  "command_timeout": "20s",
+
+  "cgroup_root": "/sys/fs/cgroup",
+  "proc_root": "/proc",
+
+  "lxc_include": "",
+  "lxc_exclude": "",
+  "lxc_network": true
+}

@@ -1,0 +1,7 @@
+anon 104857600
+file 209715200
+kernel 10485760
+slab 5242880
+sock 1048576
+shmem 2097152
+inactive_file 12345

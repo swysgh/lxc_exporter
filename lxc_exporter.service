@@ -1,0 +1,37 @@
+[Unit]
+Description=lxc_exporter - Prometheus LXC 容器指标采集器
+Documentation=file:/usr/share/doc/lxc_exporter/README.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+
+# 需要读取 cgroup v2（/sys/fs/cgroup）与容器进程的 /proc/<pid>/net/dev，
+# 因此服务以 root 运行。
+ExecStart=/usr/local/bin/lxc_exporter \
+  -web.listen-address=:9328
+
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+RestartSec=5
+StartLimitIntervalSec=60
+StartLimitBurst=3
+
+User=root
+Group=root
+
+# 安全加固
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+ProtectKernelTunables=yes
+ProtectControlGroups=no
+RestrictSUIDSGID=yes
+RestrictRealtime=yes
+LockPersonality=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+
+[Install]
+WantedBy=multi-user.target
